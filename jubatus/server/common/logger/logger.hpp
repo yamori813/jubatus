@@ -81,7 +81,11 @@ class stream_logger : jubatus::util::lang::noncopyable {
   const char* file_;
   const int line_;
   const bool abort_;
+#if defined(__FreeBSD__)
+  int thread_id_;
+#else
   const int thread_id_;
+#endif
   std::ostringstream buf_;
 };
 

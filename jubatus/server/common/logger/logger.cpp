@@ -31,6 +31,9 @@
 #include <jubatus/util/lang/cast.h>
 
 #include <string>
+#if defined(__FreeBSD__)
+#include <sys/thr.h>
+#endif
 
 #define LOGGER_NAME "jubatus"
 
@@ -38,6 +41,7 @@ namespace {
 
 #ifdef __APPLE__
 const int gettid = SYS_thread_selfid;
+#elif defined(__FreeBSD__)
 #else
 const int gettid = SYS_gettid;
 #endif
@@ -68,8 +72,15 @@ stream_logger::stream_logger(
     : level_(level),
       file_(file),
       line_(line),
-      abort_(abort),
+#if defined(__FreeBSD__)
+      abort_(abort)
+    {
+      long lwpid;
+      thr_self( &lwpid );
+      thread_id_ = lwpid; }
+#else
       thread_id_(::syscall(gettid)) {}
+#endif
 
 stream_logger::~stream_logger() {
   log4cxx::MDC::put("tid", lexical_cast<std::string>(thread_id_));
