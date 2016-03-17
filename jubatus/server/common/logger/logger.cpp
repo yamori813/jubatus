@@ -79,6 +79,7 @@ stream_logger::stream_logger(
       thr_self( &lwpid );
       thread_id_ = lwpid; }
 #else
+      abort_(abort),
       thread_id_(::syscall(gettid)) {}
 #endif
 
