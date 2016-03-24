@@ -89,17 +89,15 @@ def configure(conf):
   conf.check_cxx(lib = 'jubatus_msgpack-rpc')
   if Options.options.freebsd:
     conf.check_cxx(lib = 'jubatus_core')
-    conf.check_cxx(lib = 'log4cxx')
     conf.env.LINKFLAGS += ['-ljubatus_core']
-    conf.env.LINKFLAGS += ['-llog4cxx']
   else:
     conf.check_cxx(lib = 'dl')
 
   # pkg-config tests
   conf.find_program('pkg-config') # make sure that pkg-config command exists
+  conf.check_cfg(package = 'liblog4cxx', args = '--cflags --libs')
   if not Options.options.freebsd:
     try:
-      conf.check_cfg(package = 'liblog4cxx', args = '--cflags --libs')
       conf.check_cfg(package = 'jubatus_core', args = '--cflags --libs')
     except conf.errors.ConfigurationError:
       e = sys.exc_info()[1]
