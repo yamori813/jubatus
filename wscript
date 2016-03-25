@@ -30,10 +30,6 @@ def options(opt):
   opt.load('unittest_gtest')
   opt.load('gnu_dirs')
 
-  opt.add_option('--freebsd',
-                 action='store_true', default=False,
-                 dest='freebsd', help='build for freebsd')
-
   opt.add_option('--enable-debug',
                  action='store_true', default=False,
                  dest='debug', help='build for debug')
@@ -64,7 +60,7 @@ def options(opt):
 def configure(conf):
   conf.env.CXXFLAGS += ['-O2', '-Wall', '-g', '-pipe', '-pthread'];
   conf.env.LINKFLAGS += ['-pthread']
-  if Options.options.freebsd:
+  if sys.platform.startswith("freebsd"):
     conf.env.CXXFLAGS += ['-I/usr/local/include']
     conf.env.LINKFLAGS += ['-L/usr/local/lib']
 
@@ -87,7 +83,7 @@ def configure(conf):
   conf.check_cxx(lib = 'msgpack')
   conf.check_cxx(lib = 'jubatus_mpio')
   conf.check_cxx(lib = 'jubatus_msgpack-rpc')
-  if Options.options.freebsd:
+  if sys.platform.startswith("freebsd"):
     conf.check_cxx(lib = 'jubatus_core')
     conf.env.LINKFLAGS += ['-ljubatus_core']
   else:
@@ -95,14 +91,13 @@ def configure(conf):
 
   # pkg-config tests
   conf.find_program('pkg-config') # make sure that pkg-config command exists
-  conf.check_cfg(package = 'liblog4cxx', args = '--cflags --libs')
-  if not Options.options.freebsd:
-    try:
-      conf.check_cfg(package = 'jubatus_core', args = '--cflags --libs')
-    except conf.errors.ConfigurationError:
-      e = sys.exc_info()[1]
-      conf.to_log("PKG_CONFIG_PATH: " + os.environ.get('PKG_CONFIG_PATH', ''))
-      conf.fatal("Failed to find the library. Please confirm that PKG_CONFIG_PATH environment variable is correctly set.", e)
+  try:
+    conf.check_cfg(package = 'liblog4cxx', args = '--cflags --libs')
+    conf.check_cfg(package = 'jubatus_core', args = '--cflags --libs')
+  except conf.errors.ConfigurationError:
+    e = sys.exc_info()[1]
+    conf.to_log("PKG_CONFIG_PATH: " + os.environ.get('PKG_CONFIG_PATH', ''))
+    conf.fatal("Failed to find the library. Please confirm that PKG_CONFIG_PATH environment variable is correctly set.", e)
 
   conf.check_cxx(header_name = 'unistd.h')
   conf.check_cxx(header_name = 'sys/types.h')
