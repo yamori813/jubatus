@@ -39,12 +39,17 @@
 
 namespace {
 
+inline int gettid() {
 #ifdef __APPLE__
-const int gettid = SYS_thread_selfid;
+  return ::syscall(SYS_thread_selfid);
 #elif defined(__FreeBSD__)
+  long lwpid;
+  thr_self(&lwpid);
+  return (int) lwpid;
 #else
-const int gettid = SYS_gettid;
+  return ::syscall(SYS_gettid);
 #endif
+}
 
 }  // namespace
 
@@ -72,16 +77,8 @@ stream_logger::stream_logger(
     : level_(level),
       file_(file),
       line_(line),
-#if defined(__FreeBSD__)
-      abort_(abort)
-    {
-      long lwpid;
-      thr_self( &lwpid );
-      thread_id_ = lwpid; }
-#else
       abort_(abort),
-      thread_id_(::syscall(gettid)) {}
-#endif
+      thread_id_(gettid()) {}
 
 stream_logger::~stream_logger() {
   log4cxx::MDC::put("tid", lexical_cast<std::string>(thread_id_));
