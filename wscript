@@ -83,11 +83,6 @@ def configure(conf):
   conf.check_cxx(lib = 'msgpack')
   conf.check_cxx(lib = 'jubatus_mpio')
   conf.check_cxx(lib = 'jubatus_msgpack-rpc')
-  if sys.platform.startswith("freebsd"):
-    conf.check_cxx(lib = 'jubatus_core')
-    conf.env.LINKFLAGS += ['-ljubatus_core']
-  else:
-    conf.check_cxx(lib = 'dl')
 
   # pkg-config tests
   conf.find_program('pkg-config') # make sure that pkg-config command exists
