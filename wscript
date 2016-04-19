@@ -60,9 +60,9 @@ def options(opt):
 def configure(conf):
   conf.env.CXXFLAGS += ['-O2', '-Wall', '-g', '-pipe', '-pthread'];
   conf.env.LINKFLAGS += ['-pthread']
-  if sys.platform.startswith("freebsd"):
-    conf.env.CXXFLAGS += ['-I/usr/local/include']
-    conf.env.LINKFLAGS += ['-L/usr/local/lib']
+#  if sys.platform.startswith("freebsd"):
+#    conf.env.CXXFLAGS += ['-I/usr/local/include']
+#    conf.env.LINKFLAGS += ['-L/usr/local/lib']
 
   conf.load('compiler_cxx')
   conf.load('unittest_gtest')
